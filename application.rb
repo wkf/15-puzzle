@@ -1,60 +1,45 @@
 
 class Puzzle
 
-  @@Solved = [
+  attr_reader :grid
+
+  SOLVED = [
     [1,2,3,4],
     [5,6,7,8],
     [9,10,11,12],
     [13,14,15,0]
-  ]
+  ].freeze
 
-  @@Directions = [:up,:down,:left,:right]
+  DIRECTIONS = [:up,:down,:left,:right].freeze
 
   def initialize
-    @grid, @row, @col = @@Solved, 3, 3
-    1000.times do
-      direction = @@Directions[rand(4)]
-      move!(direction)
-    end
-  end
-
-  def grid
-    @grid
+    @grid, @cur_row, @cur_col = SOLVED, 3, 3
+    1000.times { move!(DIRECTIONS[rand(4)]) }
   end
 
   def solved?
-    @grid == @@Solved
+    @grid == SOLVED
   end
 
-  def move! direction
+  def move!(direction)
     case direction
-    when :up then
-      if @row > 0 then
-        swap(@row,@col,@row-1,@col)
-        @row -= 1
-      end
-    when :down then
-      if @row < 3 then
-        swap(@row,@col,@row+1,@col)
-        @row += 1
-      end
-    when :left then
-      if @col > 0 then
-        swap(@row,@col,@row,@col-1)
-        @col -= 1
-      end
-    when :right then
-      if @col < 3 then
-        swap(@row,@col,@row,@col+1)
-        @col += 1
-      end
+    when :up
+      swap!(-1, 0) if @cur_row > 0
+    when :down
+      swap!(+1, 0) if @cur_row < 3
+    when :left
+      swap!(0, -1) if @cur_col > 0
+    when :right
+      swap!(0, +1) if @cur_col < 3
     end
   end
 
   private
 
-  def swap row0,col0,row1,col1
-    @grid[row1][col1], @grid[row0][col0] = @grid[row0][col0], @grid[row1][col1]
+  def swap!(row_mod, col_mod)
+    new_row, new_col = @cur_row + row_mod, @cur_col + col_mod
+    @grid[new_row][new_col], @grid[@cur_row][@cur_col] = @grid[@cur_row][@cur_col], @grid[new_row][new_col]
+    @cur_row, @cur_col = new_row, new_col
   end
 
 
